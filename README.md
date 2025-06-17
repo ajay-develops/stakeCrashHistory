@@ -1,53 +1,68 @@
-# Next.js & HeroUI Template
+# Stake Crash Analytics
 
-This is a template for creating applications using Next.js 14 (app directory) and HeroUI (v2).
+Unlock the secrets of the global Stake Crash game with this easy-to-use analytics tool! Simply upload your game history JSON file and get instant, in-depth insights into patterns, streaks, and crash points.
 
-[Try it on CodeSandbox](https://githubbox.com/heroui-inc/heroui/next-app-template)
+---
+
+## Features
+
+- **Global Crash History Analysis:** Dive deep into the complete history of the Stake Crash game, not just your personal bets.
+- **Customizable Highlighting:** Set your desired crashpoint threshold to easily spot "green" (higher multiplier) crashes.
+- **Streak Tracking:** See the number of non-green crashes that occurred before each highlighted crash.
+- **Max Gap Identification:** Discover the longest recorded streak of non-green crashes, helping you identify the most extended "dry spells" in the game's history.
+- **Intuitive Interface:** A clean, single-page application designed for quick analysis.
+
+---
+
+## How It Works
+
+This tool processes the JSON history file directly from the Stake Crash game. It identifies patterns and calculates statistics based on the global game outcomes.
+
+---
+
+## Getting Started
+
+Follow these simple steps to analyze the Stake Crash history:
+
+1.  **Get the History File:**
+
+    - **Copy Code:** Click the "Copy Code" button on the app's page.
+    - **Go to Stake Crash:** Open your web browser and navigate to the Stake Crash game page on Stake.com.
+    - **Open Browser Console:**
+      - **Windows/Linux:** Press `Ctrl + Shift + J`
+      - **Mac:** Press `Cmd + Option + J`
+    - **Paste & Download:** In the console, paste the copied code and press `Enter`. A JSON file containing the game's history will automatically download to your computer.
+
+2.  **Upload the File:**
+
+    - On the app's page, simply **drag and drop** the downloaded JSON file into the designated upload area, or use the file input to select it.
+
+3.  **View Analytics:**
+    - Once uploaded, the table will populate with crash history chips.
+    - Use the **"Highlight Crashes from or equal to"** input to set your desired multiplier threshold. Crashes at or above this value will be highlighted green.
+    - Observe the numbers below the green chips to see the **streak length** (number of non-green crashes) leading up to that green crash.
+    - At the top of the table, you'll see the **"Record Gap Between Green Crashes,"** indicating the longest observed streak of non-green crashes.
+
+---
 
 ## Technologies Used
 
-- [Next.js 14](https://nextjs.org/docs/getting-started)
-- [HeroUI v2](https://heroui.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Framer Motion](https://www.framer.com/motion/)
-- [next-themes](https://github.com/pacocoursey/next-themes)
+- **React:** For building the user interface.
+- **Next.js:** The React framework for production.
+- **Tailwind CSS:** For efficient and highly customizable styling.
+- **`@heroui/react` & `@heroui/chip`:** UI components for a polished look.
+- **`lucide-react`:** For elegant icons.
 
-## How to Use
+---
 
-### Use the template with create-next-app
+## Contributing
 
-To create a new project based on this template using `create-next-app`, run the following command:
+We welcome contributions! If you have suggestions for improvements, feature requests, or find a bug, feel free to open an issue or submit a pull request.
 
-```bash
-npx create-next-app -e https://github.com/heroui-inc/next-app-template
-```
-
-### Install dependencies
-
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
-
-```bash
-npm install
-```
-
-### Run the development server
-
-```bash
-npm run dev
-```
-
-### Setup pnpm (optional)
-
-If you are using `pnpm`, you need to add the following code to your `.npmrc` file:
-
-```bash
-public-hoist-pattern[]=*@heroui/*
-```
-
-After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
+---
 
 ## License
 
-Licensed under the [MIT license](https://github.com/heroui-inc/next-app-template/blob/main/LICENSE).
+This project is open-source and available under the [MIT License](LICENSE).
+
+---
