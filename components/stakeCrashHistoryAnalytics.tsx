@@ -127,17 +127,47 @@ function CrashHistoryTable({
   highlightCrashesFrom?: number | null;
   setHighlightCrashesFrom: (value: number | null) => void;
 }) {
-  const { processedCrashes, maxGap } = React.useMemo(() => {
+  const {
+    processedCrashes,
+    maxGap,
+    totalGreens,
+    totalBets,
+    greensAfterPreviousGreen,
+    greensAfterPreviousNonGreen,
+  } = React.useMemo(() => {
     let currentGap = 0; // Counts non-green chips *between* green chips
     let maxGapFound = 0;
     let lastGreenIndex = -1; // Tracks the index of the previously found green chip
+    let greenCount = 0; // Counts total green chips
+    let greensAfterGreenCount = 0; // Count for greens immediately following a green
+    let greensAfterNonGreenCount = 0; // Count for greens immediately following a non-green
 
     const crashesWithGaps = fileContents.map((crashGame, index) => {
       const isGreen = crashGame.crashpoint >= (highlightCrashesFrom || 0);
       let gapText = "";
       let calculatedGap = 0;
 
+      // Determine the type of the *previous* crash for accurate counting
+      const previousCrashWasGreen =
+        index > 0
+          ? fileContents[index - 1].crashpoint >= (highlightCrashesFrom || 0)
+          : false;
+
       if (isGreen) {
+        greenCount++; // Increment green chip count
+
+        if (index > 0) {
+          // Check only if it's not the first element
+          if (previousCrashWasGreen) {
+            greensAfterGreenCount++;
+          } else {
+            greensAfterNonGreenCount++;
+          }
+        } else {
+          // If the first crash is green, it's considered a green after a "non-green" (as there's no previous crash)
+          greensAfterNonGreenCount++;
+        }
+
         // If this is the very first green chip encountered
         if (lastGreenIndex === -1) {
           calculatedGap = index + 1; // Its position is (index + 1) from the start
@@ -162,11 +192,40 @@ function CrashHistoryTable({
       };
     });
 
-    return { processedCrashes: crashesWithGaps, maxGap: maxGapFound };
+    return {
+      processedCrashes: crashesWithGaps,
+      maxGap: maxGapFound,
+      totalGreens: greenCount,
+      totalBets: fileContents.length,
+      greensAfterPreviousGreen: greensAfterGreenCount,
+      greensAfterPreviousNonGreen: greensAfterNonGreenCount,
+    };
   }, [fileContents, highlightCrashesFrom]);
 
   return (
     <div className="mt-6 w-full flex flex-col gap-8 items-center justify-center">
+      {/* Total Bets and Greens Display */}
+      {Boolean(fileContents.length) && (
+        <div className="text-center text-base font-medium text-default-600">
+          <p>
+            Total Bets: <span className="text-primary-500">{totalBets}</span>
+          </p>
+          <p>
+            Total Greens:{" "}
+            <span className="text-success-500">{totalGreens}</span>
+          </p>
+          <p>
+            Greens After Previous Green:{" "}
+            <span className="text-success-500">{greensAfterPreviousGreen}</span>
+          </p>
+          <p>
+            Greens After Previous Non-Green:{" "}
+            <span className="text-success-500">
+              {greensAfterPreviousNonGreen}
+            </span>
+          </p>
+        </div>
+      )}
       {/* Max Gap Display */}
       {Boolean(fileContents.length) && maxGap > 0 && (
         <div className="text-center text-lg font-medium text-default-600">
