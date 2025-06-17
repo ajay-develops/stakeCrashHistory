@@ -3,7 +3,8 @@
 import React from "react";
 import { Button, Input, NumberInput } from "@heroui/react";
 import { Chip } from "@heroui/chip";
-import { FileJson } from "lucide-react"; // Assuming lucide-react for icons
+import { FileJson } from "lucide-react";
+
 import { MultiplayerCrash } from "@/types";
 
 // --- StakeCrashHistoryAnalytics Component (Consolidated Logic) ---
@@ -35,8 +36,6 @@ export const StakeCrashHistoryAnalytics = ({
       <CrashHistoryTable
         fileContents={fileContents}
         highlightCrashesFrom={highlightCrashesFrom}
-        // setHighlightCrashesFrom is passed down but not directly used in table's rendering
-        setHighlightCrashesFrom={setHighlightCrashesFrom}
       />
     </>
   );
@@ -121,11 +120,9 @@ const getOrdinalSuffix = (n: number) => {
 function CrashHistoryTable({
   fileContents = [],
   highlightCrashesFrom = 0, // Default to 0 for internal calculations if null
-  setHighlightCrashesFrom, // Passed down but not used for rendering in this component
 }: {
   fileContents: MultiplayerCrash[];
   highlightCrashesFrom?: number | null;
-  setHighlightCrashesFrom: (value: number | null) => void;
 }) {
   const {
     processedCrashes,
@@ -134,6 +131,8 @@ function CrashHistoryTable({
     totalBets,
     greensAfterPreviousGreen,
     greensAfterPreviousNonGreen,
+    nonGreenStreaks, // Destructure nonGreenStreaks
+    greenStreaks, // Destructure greenStreaks
   } = React.useMemo(() => {
     let currentGap = 0; // Counts non-green chips *between* green chips
     let maxGapFound = 0;
@@ -141,6 +140,12 @@ function CrashHistoryTable({
     let greenCount = 0; // Counts total green chips
     let greensAfterGreenCount = 0; // Count for greens immediately following a green
     let greensAfterNonGreenCount = 0; // Count for greens immediately following a non-green
+
+    // Streak counters
+    const nonGreenStreaks: { [key: number]: number } = {};
+    const greenStreaks: { [key: number]: number } = {};
+    let currentNonGreenStreak = 0;
+    let currentGreenStreak = 0;
 
     const crashesWithGaps = fileContents.map((crashGame, index) => {
       const isGreen = crashGame.crashpoint >= (highlightCrashesFrom || 0);
@@ -155,6 +160,14 @@ function CrashHistoryTable({
 
       if (isGreen) {
         greenCount++; // Increment green chip count
+
+        // Process non-green streak when a green is encountered
+        if (currentNonGreenStreak > 0) {
+          nonGreenStreaks[currentNonGreenStreak] =
+            (nonGreenStreaks[currentNonGreenStreak] || 0) + 1;
+          currentNonGreenStreak = 0; // Reset non-green streak
+        }
+        currentGreenStreak++; // Increment green streak
 
         if (index > 0) {
           // Check only if it's not the first element
@@ -182,6 +195,13 @@ function CrashHistoryTable({
         currentGap = 0; // Reset current gap count after a green chip
         lastGreenIndex = index; // Update the index of the last found green chip
       } else {
+        // Process green streak when a non-green is encountered
+        if (currentGreenStreak > 0) {
+          greenStreaks[currentGreenStreak] =
+            (greenStreaks[currentGreenStreak] || 0) + 1;
+          currentGreenStreak = 0; // Reset green streak
+        }
+        currentNonGreenStreak++; // Increment non-green streak
         currentGap++; // Increment gap for non-green chips
       }
 
@@ -192,6 +212,16 @@ function CrashHistoryTable({
       };
     });
 
+    // Capture any remaining streaks after the loop finishes
+    if (currentNonGreenStreak > 0) {
+      nonGreenStreaks[currentNonGreenStreak] =
+        (nonGreenStreaks[currentNonGreenStreak] || 0) + 1;
+    }
+    if (currentGreenStreak > 0) {
+      greenStreaks[currentGreenStreak] =
+        (greenStreaks[currentGreenStreak] || 0) + 1;
+    }
+
     return {
       processedCrashes: crashesWithGaps,
       maxGap: maxGapFound,
@@ -199,6 +229,8 @@ function CrashHistoryTable({
       totalBets: fileContents.length,
       greensAfterPreviousGreen: greensAfterGreenCount,
       greensAfterPreviousNonGreen: greensAfterNonGreenCount,
+      nonGreenStreaks, // Return nonGreenStreaks
+      greenStreaks, // Return greenStreaks
     };
   }, [fileContents, highlightCrashesFrom]);
 
@@ -226,6 +258,58 @@ function CrashHistoryTable({
           </p>
         </div>
       )}
+
+      {/* --- */}
+      {/* Streak Analytics Display */}
+      {Boolean(fileContents.length) && (
+        <div className="flex flex-wrap justify-center gap-4 text-center">
+          <div className="p-4 border rounded-lg shadow-sm bg-content1">
+            <h3 className="text-md font-semibold mb-2">Non-Green Streaks</h3>
+            {Object.keys(nonGreenStreaks).length > 0 ? (
+              Object.entries(nonGreenStreaks)
+                .sort(([a], [b]) => Number(a) - Number(b)) // Sort by streak length
+                .map(([length, count]) => (
+                  <p key={`nongreen-streak-${length}`} className="text-sm">
+                    <span className="font-medium">{length}</span>
+                    {Number(length) == 1 ? " " : " consecutive "}
+                    non-green: <span className="text-default-500">
+                      {count}
+                    </span>{" "}
+                    times
+                  </p>
+                ))
+            ) : (
+              <p className="text-sm text-default-400">
+                No non-green streaks found.
+              </p>
+            )}
+          </div>
+
+          <div className="p-4 border rounded-lg shadow-sm bg-content1">
+            <h3 className="text-md font-semibold mb-2">Green Streaks</h3>
+            {Object.keys(greenStreaks).length > 0 ? (
+              Object.entries(greenStreaks)
+                .sort(([a], [b]) => Number(a) - Number(b)) // Sort by streak length
+                .map(([length, count]) => (
+                  <p key={`green-streak-${length}`} className="text-sm">
+                    <span className="font-medium">{length}</span>
+                    {Number(length) == 1 ? " " : " consecutive "}
+                    green: <span className="text-success-500">
+                      {count}
+                    </span>{" "}
+                    times
+                  </p>
+                ))
+            ) : (
+              <p className="text-sm text-default-400">
+                No green streaks found.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+      {/* --- */}
+
       {/* Max Gap Display */}
       {Boolean(fileContents.length) && maxGap > 0 && (
         <div className="text-center text-lg font-medium text-default-600">
