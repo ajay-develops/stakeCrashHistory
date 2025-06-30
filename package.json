@@ -26,6 +26,8 @@
     "@heroui/theme": "2.4.17",
     "@react-aria/ssr": "3.9.9",
     "@react-aria/visually-hidden": "3.8.24",
+    "@supabase/supabase-js": "^2.50.2",
+    "@vercel/edge-config": "^1.4.0",
     "clsx": "2.1.1",
     "framer-motion": "11.13.1",
     "intl-messageformat": "10.7.16",
