@@ -34,7 +34,7 @@ export async function GET(request: Request) {
     }
 
     // Fetch decrypted headers from internal GET /api/crash-history/headers
-    const headersRes = await fetch(`/api/crash-history/headers`, {
+    const headersRes = await fetch(`/api/stake-crash-history/headers`, {
       next: { revalidate: 60 * 30 },
     });
 
