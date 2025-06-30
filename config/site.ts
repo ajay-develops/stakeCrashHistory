@@ -5,16 +5,20 @@ export const siteConfig = {
   description: "A tool to view stake crash history data and gain insights.",
   navItems: [
     {
-      label: "Crash History",
+      label: "History",
       href: "/",
     },
     {
-      label: "Cost Profit Calculator",
+      label: "Cost-Profit",
       href: "/stake-cost-profit-calculator",
     },
     {
-      label: "Merged Calculator",
+      label: "Merged",
       href: "/merged-stake-calculator",
+    },
+    {
+      label: "Upload",
+      href: "/update-headers",
     },
   ],
   navMenuItems: [
@@ -29,6 +33,10 @@ export const siteConfig = {
     {
       label: "Merged Calculator",
       href: "/merged-stake-calculator",
+    },
+    {
+      label: "Upload Headers",
+      href: "/update-headers",
     },
   ],
   links: {
