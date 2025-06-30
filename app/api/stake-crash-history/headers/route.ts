@@ -23,11 +23,11 @@ export async function POST(req: Request) {
       );
     }
 
-    const encryptedHeaders = encrypt(JSON.stringify(body.headers));
+    const stringifiedHeaders = JSON.stringify(body.headers);
 
     const { error } = await supabase.from("stake_headers").insert([
       {
-        headers: encryptedHeaders,
+        headers: stringifiedHeaders,
       },
     ]);
 
@@ -66,8 +66,7 @@ export async function GET() {
       );
     }
 
-    const decrypted = decrypt(data.headers);
-    const parsedHeaders = JSON.parse(decrypted);
+    const parsedHeaders = JSON.parse(data.headers);
 
     const response = NextResponse.json({ headers: parsedHeaders });
 
