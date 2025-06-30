@@ -34,9 +34,12 @@ export async function GET(request: Request) {
     }
 
     // Fetch decrypted headers from internal GET /api/crash-history/headers
-    const headersRes = await fetch(`/api/stake-crash-history/headers`, {
-      next: { revalidate: 60 * 30 },
-    });
+    const headersRes = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL!}/api/stake-crash-history/headers`,
+      {
+        next: { revalidate: 60 * 30 },
+      }
+    );
 
     if (!headersRes.ok) {
       const errorText = await headersRes.text();
