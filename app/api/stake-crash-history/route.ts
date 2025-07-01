@@ -68,7 +68,7 @@ export async function GET(request: Request) {
           variables: { limit, offset },
           operationName: "CrashGameListHistory",
         }),
-        next: { revalidate: 10 }, // Optional: Next.js revalidation
+        next: { revalidate: 2 }, // Optional: Next.js revalidation
       }
     );
 
