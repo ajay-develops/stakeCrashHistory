@@ -18,18 +18,30 @@ export default function ManualUploadPage() {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const extractHeadersFromCurl = (curl: string): Record<string, string> => {
+  function extractHeadersFromCurl(curlCommand: string): Record<string, string> {
     const headers: Record<string, string> = {};
-    const headerRegex = /-H\s+['"]([^:]+):\s?([^'"]+)['"]/g;
+    const headerRegex = /-H\s+'([^']+)'/g;
+    const cookieRegex = /-b\s+'([^']+)'/g;
 
+    // Match all -H 'Header: value'
     let match;
-    while ((match = headerRegex.exec(curl)) !== null) {
-      const [, key, value] = match;
-      headers[key.trim()] = value.trim();
+    while ((match = headerRegex.exec(curlCommand)) !== null) {
+      const [key, ...valueParts] = match[1].split(": ");
+      const value = valueParts.join(": ");
+      const lowerKey = key.toLowerCase();
+      // if (allowedHeaders.has(lowerKey) && value) {
+      headers[lowerKey] = value;
+      // }
+    }
+
+    // Match cookies from -b flag
+    const cookieMatch = cookieRegex.exec(curlCommand);
+    if (cookieMatch && cookieMatch[1]) {
+      headers["cookie"] = cookieMatch[1];
     }
 
     return headers;
-  };
+  }
 
   const handleUpload = async () => {
     setIsLoading(true);

@@ -37,7 +37,7 @@ export async function GET(request: Request) {
     const headersRes = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL!}/api/stake-crash-history/headers`,
       {
-        next: { revalidate: 60 * 30 },
+        next: { revalidate: 10 },
       }
     );
 
@@ -54,6 +54,7 @@ export async function GET(request: Request) {
     }
 
     const headersJson = await headersRes.json();
+    console.log("headersJson", headersJson);
     const storedHeaders = headersJson.headers;
 
     // Send GraphQL request to Stake.ac
@@ -78,6 +79,7 @@ export async function GET(request: Request) {
         {
           error: `request to ${process.env.STAKE_SERVER_URL} failed: ${response.statusText}`,
           details: text,
+          sentHeaders: headersJson,
         },
         { status: response.status }
       );
